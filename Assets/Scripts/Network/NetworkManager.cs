@@ -13,7 +13,7 @@ namespace PA.Network
 
         private int previousDiffFrame = 0;
         private int previousStateFrame = 0;
-        private Stack<Action> threadUnifierStack = new Stack<Action>();
+        private Queue<System.Action> threadUnifierStack = new Queue<System.Action>();
         private SocketClient client = null;
 
         #region Events
@@ -27,7 +27,9 @@ namespace PA.Network
         {
             this.previousDiffFrame = data.frame;
             this.previousStateFrame = data.frame;
-            this.entityManager.Get(data.assignedId);
+            this.OnStateUpdate(data);
+            Entity entity = this.entityManager.Get(data.assignedId);
+            // Assigner la caméra à cette entité
         }
 
         private void OnStateUpdate(StateUpdateInfo state)
@@ -35,10 +37,14 @@ namespace PA.Network
             if (this.previousStateFrame < state.frame)
             {
                 this.previousStateFrame = state.frame;
+
                 foreach (var entity in state.data)
+                {
+                    this.entityManager.Prepare(entity.id);
                     foreach (var component in entity.components)
-                    {
-                    }
+                        this.entityManager.Apply(entity.id, component);
+                }
+                this.entityManager.Flush();
             }
         }
 
@@ -55,7 +61,7 @@ namespace PA.Network
 
         private Action<T> ExecuteOnMainThread<T>(Action<T> action)
         {
-            return (arg) => this.threadUnifierStack.Push(() => action(arg));
+            return (arg) => this.threadUnifierStack.Enqueue(() => action(arg));
         }
 
         #endregion
@@ -76,14 +82,14 @@ namespace PA.Network
         private void FixedUpdate()
         {
             while (this.threadUnifierStack.Count > 0)
-                try { this.threadUnifierStack.Pop()(); }
-                catch (Exception e) { Debug.LogError(e.Message); }
+                try { this.threadUnifierStack.Dequeue()(); }
+                catch (Exception e) { Debug.LogError(e.ToString()); }
 
-            if (Input.GetKey(KeyCode.W)) this.client.Emit("action", 2);
-            if (Input.GetKey(KeyCode.S)) this.client.Emit("action", 4);
-            if (Input.GetKey(KeyCode.A)) this.client.Emit("action", 1);
-            if (Input.GetKey(KeyCode.D)) this.client.Emit("action", 3);
-            if (Input.GetKey(KeyCode.Space)) this.client.Emit("action", 5);
+            if (Input.GetKey(KeyCode.W)) this.client.Emit("action", Data.Action.MOVE_FORWARD);
+            if (Input.GetKey(KeyCode.S)) this.client.Emit("action", Data.Action.MOVE_BACKWARD);
+            if (Input.GetKey(KeyCode.A)) this.client.Emit("action", Data.Action.MOVE_LEFT);
+            if (Input.GetKey(KeyCode.D)) this.client.Emit("action", Data.Action.MOVE_RIGHT);
+            if (Input.GetKey(KeyCode.Space)) this.client.Emit("action", Data.Action.JUMP);
         }
 
         #endregion

@@ -10,6 +10,8 @@ namespace PA.Engine
         [SerializeField] private GameObject entityPrefab = null;
 
         private readonly Dictionary<int, Entity> entities = new Dictionary<int, Entity>();
+        private readonly List<int> idsToSave = new List<int>();
+        private readonly List<int> idsToDelete = new List<int>();
 
         public Entity Apply(int id, ComponentInfo component)
         {
@@ -40,9 +42,30 @@ namespace PA.Engine
             return entity;
         }
 
+        public void Flush()
+        {
+            foreach (int id in this.entities.Keys)
+                if (!this.idsToSave.Contains(id))
+                {
+                    this.idsToDelete.Add(id);
+                    GameObject.Destroy(this.entities[id].gameObject);
+                }
+
+            foreach (int id in this.idsToDelete)
+                this.entities.Remove(id);
+            this.idsToDelete.Clear();
+            this.idsToSave.Clear();
+        }
+
         public Entity Get(int id)
         {
             return this.entities.ContainsKey(id) ? this.entities[id] : null;
+        }
+
+        public Entity Prepare(int id)
+        {
+            this.idsToSave.Add(id);
+            return this.Create(id);
         }
     }
 }

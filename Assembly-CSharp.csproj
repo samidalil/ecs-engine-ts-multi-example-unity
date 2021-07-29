@@ -60,6 +60,7 @@
     <Compile Include="Assets\Scripts\Data\NetworkStructures.cs" />
     <Compile Include="Assets\Scripts\Network\SocketClient.cs" />
     <Compile Include="Assets\Scripts\Engine\Entity.cs" />
+    <Compile Include="Assets\Scripts\Data\Enumerations.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Packages\WebSocketSharp-netstandard.1.0.1\lib\netstandard2.0\websocket-sharp.xml" />
