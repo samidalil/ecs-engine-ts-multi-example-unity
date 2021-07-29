@@ -24,7 +24,7 @@ namespace PA.Engine
             {
                 case Components.Transform:
                     entity.transform.position = component.data.position;
-                    //entity.transform.rotation = Quaternion.Euler(data.rotation);
+                    entity.transform.rotation = Quaternion.Euler(component.data.rotation);
                     //entity.transform.localScale = data.scale;
                     break;
             }

@@ -85,11 +85,11 @@ namespace PA.Network
                 try { this.threadUnifierStack.Dequeue()(); }
                 catch (Exception e) { Debug.LogError(e.ToString()); }
 
-            if (Input.GetKey(KeyCode.W)) this.client.Emit("action", Data.Action.MOVE_FORWARD);
-            if (Input.GetKey(KeyCode.S)) this.client.Emit("action", Data.Action.MOVE_BACKWARD);
-            if (Input.GetKey(KeyCode.A)) this.client.Emit("action", Data.Action.MOVE_LEFT);
-            if (Input.GetKey(KeyCode.D)) this.client.Emit("action", Data.Action.MOVE_RIGHT);
-            if (Input.GetKey(KeyCode.Space)) this.client.Emit("action", Data.Action.JUMP);
+            if (Input.GetKey(KeyCode.UpArrow)) this.client.Emit("action", Data.Action.MOVE_FORWARD);
+            if (Input.GetKey(KeyCode.DownArrow)) this.client.Emit("action", Data.Action.MOVE_BACKWARD);
+            if (Input.GetKey(KeyCode.LeftArrow)) this.client.Emit("action", Data.Action.MOVE_LEFT);
+            if (Input.GetKey(KeyCode.RightArrow)) this.client.Emit("action", Data.Action.MOVE_RIGHT);
+            if (Input.GetKeyDown(KeyCode.Space)) this.client.Emit("action", Data.Action.JUMP);
         }
 
         #endregion
