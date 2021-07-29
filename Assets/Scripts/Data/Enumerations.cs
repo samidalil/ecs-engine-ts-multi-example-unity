@@ -19,4 +19,12 @@
         Action = 1 << 3,
         Network = 1 << 4,
     }
+
+    public enum NetworkEventType
+    {
+        NONE,
+        CREATED,
+        MODIFIED,
+        REMOVED,
+    }
 }

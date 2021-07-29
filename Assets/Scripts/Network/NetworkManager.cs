@@ -29,7 +29,7 @@ namespace PA.Network
             this.previousStateFrame = data.frame;
             this.OnStateUpdate(data);
             Entity entity = this.entityManager.Get(data.assignedId);
-            // Assigner la caméra à cette entité
+            Camera.main.transform.SetParent(entity.transform);
         }
 
         private void OnStateUpdate(StateUpdateInfo state)
@@ -48,14 +48,29 @@ namespace PA.Network
             }
         }
 
-        private void OnDiffUpdate(StateUpdateInfo diff)
+        private void OnDiffUpdate(DiffUpdateInfo diff)
         {
             if (this.previousDiffFrame < diff.frame && this.previousStateFrame < diff.frame)
             {
                 this.previousDiffFrame = diff.frame;
                 foreach (var entity in diff.data)
-                    foreach (var component in entity.components)
-                        this.entityManager.Apply(entity.id, component);
+                {
+                    switch (entity.eventType)
+                    {
+                        case NetworkEventType.CREATED:
+                            var e = this.entityManager.Create(entity.id);
+                            foreach (var component in entity.components)
+                                this.entityManager.Apply(entity.id, component);
+                            break;
+                        case NetworkEventType.MODIFIED:
+                            foreach (var component in entity.components)
+                                this.entityManager.Apply(entity.id, component);
+                            break;
+                        case NetworkEventType.REMOVED:
+                            this.entityManager.Remove(entity.id);
+                            break;
+                    }
+                }
             }
         }
 
@@ -72,7 +87,7 @@ namespace PA.Network
         {
             this.client = new SocketClient(this.serverUrl);
             this.client
-                .On("diff", this.ExecuteOnMainThread<StateUpdateInfo>(this.OnDiffUpdate))
+                .On("diff", this.ExecuteOnMainThread<DiffUpdateInfo>(this.OnDiffUpdate))
                 .On("entityCreated", this.ExecuteOnMainThread<EntityCreatedInfo>(this.OnEntityCreated))
                 .On("init", this.ExecuteOnMainThread<InitInfo>(this.OnInit))
                 .On("state", this.ExecuteOnMainThread<StateUpdateInfo>(this.OnStateUpdate))

@@ -23,9 +23,9 @@ namespace PA.Engine
             switch ((Components)component.id)
             {
                 case Components.Transform:
-                    entity.transform.position = component.data.position;
+                    entity.SetPosition(component.data.position);
                     entity.transform.rotation = Quaternion.Euler(component.data.rotation);
-                    //entity.transform.localScale = data.scale;
+                    entity.transform.localScale = component.data.scale;
                     break;
             }
 
@@ -67,6 +67,14 @@ namespace PA.Engine
         {
             this.idsToSave.Add(id);
             return this.Create(id);
+        }
+
+        public void Remove(int id)
+        {
+            if (!this.entities.ContainsKey(id)) return;
+
+            GameObject.Destroy(this.entities[id].gameObject);
+            this.entities.Remove(id);
         }
     }
 }
