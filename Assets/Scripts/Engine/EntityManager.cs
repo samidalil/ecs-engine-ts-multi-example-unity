@@ -53,6 +53,7 @@ namespace PA.Engine
 
             foreach (int id in this.idsToDelete)
                 this.entities.Remove(id);
+
             this.idsToDelete.Clear();
             this.idsToSave.Clear();
         }

@@ -92,6 +92,11 @@ namespace PA.Network
             if (Input.GetKey(KeyCode.Space)) this.client.Emit("action", Data.Action.JUMP);
         }
 
+        private void OnApplicationQuit()
+        {
+            this.client.Close();
+        }
+
         #endregion
     }
 }

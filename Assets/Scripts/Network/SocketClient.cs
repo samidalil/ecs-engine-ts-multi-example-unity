@@ -35,6 +35,12 @@ namespace PA.Network
             };
         }
 
+        public SocketClient Close()
+        {
+            this.ws.Close();
+            return this;
+        }
+
         public SocketClient Connect()
         {
             this.ws.Connect();
