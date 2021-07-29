@@ -11,16 +11,6 @@ namespace PA.Engine
 
         private readonly Dictionary<int, Entity> entities = new Dictionary<int, Entity>();
 
-        public Entity Create(int id)
-        {
-            if (this.entities.ContainsKey(id))
-                return this.entities[id];
-
-            Entity entity = GameObject.Instantiate(this.entityPrefab).GetComponent<Entity>();
-            this.entities.Add(id, entity);
-            return entity;
-        }
-
         public Entity Apply(int id, ComponentInfo component)
         {
             if (!this.entities.ContainsKey(id))
@@ -38,6 +28,21 @@ namespace PA.Engine
             }
 
             return entity;
+        }
+
+        public Entity Create(int id)
+        {
+            if (this.entities.ContainsKey(id))
+                return this.entities[id];
+
+            Entity entity = GameObject.Instantiate(this.entityPrefab).GetComponent<Entity>();
+            this.entities.Add(id, entity);
+            return entity;
+        }
+
+        public Entity Get(int id)
+        {
+            return this.entities.ContainsKey(id) ? this.entities[id] : null;
         }
     }
 }

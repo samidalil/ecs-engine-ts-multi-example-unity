@@ -8,7 +8,8 @@ namespace PA.Network
 {
     public class NetworkManager : MonoBehaviour
     {
-        [SerializeField] private StateManager stateManager = null;
+        [SerializeField] private string serverUrl = "ws://vps-aa672c77.vps.ovh.net:8080/";
+        [SerializeField] private EntityManager entityManager = null;
 
         private int previousDiffFrame = 0;
         private int previousStateFrame = 0;
@@ -19,7 +20,14 @@ namespace PA.Network
 
         private void OnEntityCreated(EntityCreatedInfo entity)
         {
-            this.stateManager.CreateEntity(entity.id);
+            this.entityManager.Create(entity.id);
+        }
+
+        private void OnInit(InitInfo data)
+        {
+            this.previousDiffFrame = data.frame;
+            this.previousStateFrame = data.frame;
+            this.entityManager.Get(data.assignedId);
         }
 
         private void OnStateUpdate(StateUpdateInfo state)
@@ -41,7 +49,7 @@ namespace PA.Network
                 this.previousDiffFrame = diff.frame;
                 foreach (var entity in diff.data)
                     foreach (var component in entity.components)
-                        this.stateManager.Apply(entity.id, component);
+                        this.entityManager.Apply(entity.id, component);
             }
         }
 
@@ -56,11 +64,12 @@ namespace PA.Network
 
         private void Start()
         {
-            this.client = new SocketClient();
+            this.client = new SocketClient(this.serverUrl);
             this.client
-                .On("entityCreated", this.ExecuteOnMainThread<EntityCreatedInfo>(this.OnEntityCreated))
-                .On("state", this.ExecuteOnMainThread<StateUpdateInfo>(this.OnStateUpdate))
                 .On("diff", this.ExecuteOnMainThread<StateUpdateInfo>(this.OnDiffUpdate))
+                .On("entityCreated", this.ExecuteOnMainThread<EntityCreatedInfo>(this.OnEntityCreated))
+                .On("init", this.ExecuteOnMainThread<InitInfo>(this.OnInit))
+                .On("state", this.ExecuteOnMainThread<StateUpdateInfo>(this.OnStateUpdate))
                 .Connect();
         }
 

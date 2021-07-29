@@ -36,4 +36,12 @@ namespace PA.Data
     {
         public int id;
     }
+
+    /// <summary>
+    /// Le format d'une information d'initialisation de connexion au serveur
+    /// </summary>
+    public class InitInfo : StateUpdateInfo
+    {
+        public int assignedId;
+    }
 }
